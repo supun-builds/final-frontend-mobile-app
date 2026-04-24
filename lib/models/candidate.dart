@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+
 class Candidate {
   final String candidateId;
   final String candidateName;
@@ -29,7 +29,6 @@ class Candidate {
     rank:          json['rank']          ?? 0,
   );
 
-  // Convert hex string to Flutter Color
   Color get color {
     final hex = partyColor.replaceAll('#', '');
     return Color(int.parse('FF$hex', radix: 16));
