@@ -6,7 +6,7 @@ import '../widgets/winner_card.dart';
 import '../widgets/vote_bar_chart.dart';
 import '../widgets/vote_pie_chart.dart';
 import '../widgets/center_selector.dart';
-import '../widgets/candidate_tile.dart';  
+import '../widgets/candidate_tile.dart';
 import '../widgets/tab_button.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -40,33 +40,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _loadCenters() async {
-    try {
-      final centers = await ApiService.fetchCenters();
-      setState(() => _centers = centers);
-    } catch (_) {}
+    // start stream immediately — don't wait for centers
     _subscribeStream();
+
+    // load centers in background
+    try {
+      final centers = await ApiService.fetchCenters()
+          .timeout(const Duration(seconds: 6));
+      if (mounted) setState(() => _centers = centers);
+    } catch (_) {}
   }
 
   void _subscribeStream() {
     _streamSub?.cancel();
-    setState(() { _isLoading = true; _error = null; });
+    if (mounted) setState(() { _isLoading = true; _error = null; });
 
     _streamSub = ApiService
         .voteStream(centerId: _selectedCenterId)
         .listen((data) {
       if (!mounted) return;
+
+      final rawList   = data['candidates'];
+      final totalVotes = data['totalVotes'];
+
+      if (rawList == null || totalVotes == null) return;
+
       setState(() {
         _isLoading   = false;
-        _totalVotes  = data['totalVotes'] ?? 0;
-        _candidates  = (data['candidates'] as List)
-            .map((j) => Candidate.fromJson(j))
+        _totalVotes  = totalVotes as int;
+        _candidates  = (rawList as List)
+            .map((j) => Candidate.fromJson(j as Map<String, dynamic>))
             .toList();
         _lastUpdated = DateTime.now();
       });
     }, onError: (e) {
       if (!mounted) return;
       setState(() { _error = e.toString(); _isLoading = false; });
-    });
+    }, cancelOnError: false);
   }
 
   void _onCenterChanged(String? centerId) {
