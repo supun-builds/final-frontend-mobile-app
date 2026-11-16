@@ -1,6 +1,4 @@
-
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../models/candidate.dart';
@@ -19,12 +17,10 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   List<Map<String, dynamic>> _centers = [];
-
   String? _selectedCenterId;
   String _selectedCenterName = 'Overall';
 
   List<Candidate> _candidates = [];
-
   int _totalVotes = 0;
 
   bool _isLoading = true;
@@ -46,10 +42,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _loadCenters() async {
-    // Start the results stream immediately.
     _subscribeStream();
 
-    // Load voting centers in the background.
     try {
       final centers = await ApiService.fetchCenters()
           .timeout(const Duration(seconds: 6));
@@ -60,8 +54,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _centers = centers;
       });
     } catch (_) {
-      // Keep the overall results available even if
-      // the center list cannot be loaded.
+      // Continue even if centers list fails
     }
   }
 
@@ -135,20 +128,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E1A),
+      backgroundColor: const Color(0xFFF4F5F9),
       appBar: _buildAppBar(),
       body: Column(
         children: [
+          // Iconic Sri Lankan tricolor accent strip from official website
+          _buildNationalStripe(),
+
+          // Deep maroon center selector banner
           CenterSelector(
             centers: _centers,
             selectedCenterId: _selectedCenterId,
             onChanged: _onCenterChanged,
           ),
+
           Expanded(
             child: _isLoading
                 ? const Center(
                     child: CircularProgressIndicator(
-                      color: Color(0xFF4A90D9),
+                      color: Color(0xFF6B1124),
                     ),
                   )
                 : _error != null
@@ -160,85 +158,154 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  AppBar _buildAppBar() {
-    return AppBar(
-      backgroundColor: const Color(0xFF0F1525),
-      elevation: 0,
-      title: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 4,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(
-                color: Colors.green.withOpacity(0.4),
+  PreferredSizeWidget _buildAppBar() {
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(68),
+      child: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        titleSpacing: 12,
+        title: Row(
+          children: [
+            // Emblem crest icon (Sri Lankan gold crest style without requiring image asset)
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFF39C12), Color(0xFFD35400)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(color: const Color(0xFFF1C40F), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFF39C12).withOpacity(0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.account_balance,
+                color: Colors.white,
+                size: 22,
               ),
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 7,
-                  height: 7,
-                  decoration: const BoxDecoration(
-                    color: Colors.green,
-                    shape: BoxShape.circle,
+            const SizedBox(width: 12),
+            // Trilingual Official Header Text
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Text(
+                    'මැතිවරණ කොමිෂන් සභාව',
+                    style: TextStyle(
+                      color: Color(0xFF6B1124),
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.3,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 6),
-                const Text(
-                  'LIVE',
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
+                  Text(
+                    'தேர்தல் ஆணைக்குழு • ELECTION COMMISSION',
+                    style: TextStyle(
+                      color: Color(0xFF4A5568),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Text(
-              'Election Dashboard',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
+          ],
+        ),
+        actions: [
+          // Live indicator pill
+          Padding(
+            padding: const EdgeInsets.only(right: 14),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00A859).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF00A859).withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF00A859),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Text(
+                      'LIVE',
+                      style: TextStyle(
+                        color: Color(0xFF00A859),
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    if (_lastUpdated != null) ...[
+                      const SizedBox(width: 6),
+                      Text(
+                        '${_lastUpdated!.hour.toString().padLeft(2, '0')}:'
+                        '${_lastUpdated!.minute.toString().padLeft(2, '0')}:'
+                        '${_lastUpdated!.second.toString().padLeft(2, '0')}',
+                        style: const TextStyle(
+                          color: Color(0xFF718096),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
-      actions: [
-        if (_lastUpdated != null)
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Center(
-              child: Text(
-                '${_lastUpdated!.hour.toString().padLeft(2, '0')}:'
-                '${_lastUpdated!.minute.toString().padLeft(2, '0')}:'
-                '${_lastUpdated!.second.toString().padLeft(2, '0')}',
-                style: const TextStyle(
-                  color: Colors.white38,
-                  fontSize: 11,
-                ),
-              ),
-            ),
+    );
+  }
+
+  Widget _buildNationalStripe() {
+    return SizedBox(
+      height: 3.5,
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Container(color: const Color(0xFFF5A623)), // Saffron / Orange
           ),
-      ],
+          Expanded(
+            flex: 2,
+            child: Container(color: const Color(0xFF00A859)), // Emerald Green
+          ),
+          Expanded(
+            flex: 6,
+            child: Container(color: const Color(0xFF6B1124)), // Deep Maroon
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildBody() {
     if (_candidates.isEmpty) {
       return RefreshIndicator(
+        color: const Color(0xFF6B1124),
         onRefresh: () async {
           _subscribeStream();
         },
@@ -248,8 +315,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             SizedBox(height: 180),
             Center(
               child: Text(
-                'No candidate data available',
-                style: TextStyle(color: Colors.white54),
+                'දත්ත නොමැත (No candidate data available)',
+                style: TextStyle(color: Color(0xFF718096)),
               ),
             ),
           ],
@@ -258,93 +325,112 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     return RefreshIndicator(
+      color: const Color(0xFF6B1124),
       onRefresh: () async {
         _subscribeStream();
       },
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(bottom: 24),
+        padding: const EdgeInsets.only(bottom: 30),
         children: [
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
-          // Overall or selected-center label.
-          _buildScopeLabel(),
-
-          // Total votes.
+          // Total votes card
           _buildTotalVotes(),
 
-          // Current leading candidate.
+          // Current leading candidate card
           WinnerCard(
             leader: _candidates.first,
             totalVotes: _totalVotes,
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
-          // Pie chart is retained.
+          // Pie chart card
           _buildPieChart(),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
-          // Candidate list gets the space previously
-          // occupied by the bar chart and chart tabs.
+          // Candidate list
           _buildCandidateList(),
         ],
       ),
     );
   }
 
-  Widget _buildScopeLabel() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 6,
-          ),
-          decoration: BoxDecoration(
-            color: _selectedCenterId == null
-                ? const Color(0xFF4A90D9).withOpacity(0.15)
-                : const Color(0xFF1D9E75).withOpacity(0.15),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            _selectedCenterId == null
-                ? '🌐  All Centers Combined'
-                : '📍  $_selectedCenterName',
-            style: TextStyle(
-              color: _selectedCenterId == null
-                  ? const Color(0xFF4A90D9)
-                  : const Color(0xFF1D9E75),
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildTotalVotes() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
           children: [
-            Text(
-              _fmtNum(_totalVotes),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6B1124).withOpacity(0.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.how_to_vote,
+                color: Color(0xFF6B1124),
+                size: 28,
               ),
             ),
-            const Text(
-              'Total Votes Cast',
-              style: TextStyle(
-                color: Colors.white38,
-                fontSize: 13,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'මුළු ඡන්ද සංඛ්‍යාව • TOTAL VOTES CAST',
+                    style: TextStyle(
+                      color: Color(0xFF718096),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _fmtNum(_totalVotes),
+                    style: const TextStyle(
+                      color: Color(0xFF1A202C),
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1C40F).withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: const Color(0xFFF1C40F).withOpacity(0.4),
+                ),
+              ),
+              child: Text(
+                _selectedCenterId == null ? 'All Centers' : 'Local Center',
+                style: const TextStyle(
+                  color: Color(0xFFB7791F),
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -354,33 +440,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildPieChart() {
+    if (_candidates.isEmpty) return const SizedBox.shrink();
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF0F1525),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Colors.white.withOpacity(0.06),
+            color: const Color(0xFFE2E8F0),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Column(
           children: [
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Vote Distribution',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+            Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6B1124),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                const Text(
+                  'ඡන්ද ප්‍රතිශතය • Vote Distribution',
+                  style: TextStyle(
+                    color: Color(0xFF1A202C),
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             VotePieChart(candidates: _candidates),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             _buildLegend(),
           ],
         ),
@@ -390,7 +495,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildLegend() {
     return Wrap(
-      spacing: 12,
+      spacing: 14,
       runSpacing: 8,
       children: _candidates.map((candidate) {
         return Row(
@@ -404,7 +509,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(width: 5),
+            const SizedBox(width: 6),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 220),
               child: Text(
@@ -413,8 +518,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     : candidate.party,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  color: Colors.white60,
-                  fontSize: 11,
+                  color: Color(0xFF4A5568),
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -428,16 +534,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'Candidates',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          child: Row(
+            children: [
+              Container(
+                width: 4,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6B1124),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'අපේක්ෂකයින් • Candidate Standings',
+                style: TextStyle(
+                  color: Color(0xFF1A202C),
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.3,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${_candidates.length} Candidates',
+                style: const TextStyle(
+                  color: Color(0xFF718096),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 8),
@@ -465,10 +593,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 12),
             const Text(
-              'Connection error',
+              'සම්බන්ධතා දෝෂයකි (Connection Error)',
               style: TextStyle(
-                color: Colors.white70,
+                color: Color(0xFF1A202C),
                 fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 6),
@@ -476,14 +605,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
               _error ?? 'Unknown error',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Colors.white38,
+                color: Color(0xFF718096),
                 fontSize: 12,
               ),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6B1124),
+                foregroundColor: Colors.white,
+              ),
               onPressed: _subscribeStream,
-              child: const Text('Retry'),
+              child: const Text('නැවත උත්සාහ කරන්න (Retry)'),
             ),
           ],
         ),
@@ -492,14 +625,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   String _fmtNum(int number) {
-    if (number >= 1000000) {
-      return '${(number / 1000000).toStringAsFixed(2)}M';
-    }
-
-    if (number >= 1000) {
-      return '${(number / 1000).toStringAsFixed(1)}K';
-    }
-
-    return number.toString();
+    return number.toString().replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
   }
 }

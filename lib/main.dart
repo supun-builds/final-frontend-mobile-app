@@ -8,14 +8,22 @@ class ElectionApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-    title: 'SL Election 2024',
+    title: 'Election Commission of Sri Lanka',
     debugShowCheckedModeBanner: false,
-    theme: ThemeData.dark().copyWith(
-      colorScheme: const ColorScheme.dark(
-        primary: Color(0xFF4A90D9),
-        surface: Color(0xFF0F1525),
+    theme: ThemeData.light().copyWith(
+      primaryColor: const Color(0xFF6B1124),
+      scaffoldBackgroundColor: const Color(0xFFF4F5F9),
+      cardColor: Colors.white,
+      colorScheme: const ColorScheme.light(
+        primary: Color(0xFF6B1124),
+        secondary: Color(0xFF00A859),
+        surface: Colors.white,
       ),
-      scaffoldBackgroundColor: const Color(0xFF0A0E1A),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.white,
+        foregroundColor: Color(0xFF1A202C),
+        elevation: 0,
+      ),
     ),
     home: const DashboardScreen(),
   );

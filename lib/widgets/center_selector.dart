@@ -15,64 +15,122 @@ class CenterSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF0F1525),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('Voting Center',
-          style: TextStyle(color: Colors.white38, fontSize: 11,
-                           letterSpacing: 0.8)),
-        const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A2035),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+      color: const Color(0xFF6B1124), // Official deep maroon bar
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.location_on,
+            color: Color(0xFFF1C40F), // Gold accent
+            size: 18,
           ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String?>(
-              value: selectedCenterId,
-              isExpanded: true,
-              dropdownColor: const Color(0xFF1A2035),
-              iconEnabledColor: Colors.white38,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-              items: [
-                // overall
-                const DropdownMenuItem<String?>(
-                  value: null,
-                  child: Row(children: [
-                    Icon(Icons.public, color: Color(0xFF4A90D9), size: 16),
-                    SizedBox(width: 10),
-                    Text('Overall — All Centers'),
-                  ]),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
                 ),
-                // divider
-                const DropdownMenuItem<String?>(
-                  enabled: false,
-                  value: 'divider',
-                  child: Divider(color: Colors.white12),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String?>(
+                  value: selectedCenterId,
+                  isExpanded: true,
+                  dropdownColor: Colors.white,
+                  iconEnabledColor: const Color(0xFFF1C40F),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  selectedItemBuilder: (BuildContext context) {
+                    return [
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '🏛 Overall — All Centers Combined',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(), // divider
+                      ...centers.map((c) => Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              '📍 ${c['centerName']}',
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          )),
+                    ];
+                  },
+                  items: [
+                    // overall
+                    const DropdownMenuItem<String?>(
+                      value: null,
+                      child: Row(
+                        children: [
+                          Icon(Icons.public, color: Color(0xFF6B1124), size: 16),
+                          SizedBox(width: 10),
+                          Text(
+                            'Overall — All Centers',
+                            style: TextStyle(
+                              color: Color(0xFF1A202C),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const DropdownMenuItem<String?>(
+                      enabled: false,
+                      value: 'divider',
+                      child: Divider(color: Color(0xFFE2E8F0)),
+                    ),
+                    // centers
+                    ...centers.map((c) => DropdownMenuItem<String?>(
+                          value: c['centerId'] as String,
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.location_city,
+                                color: Color(0xFF6B1124),
+                                size: 16,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  c['centerName'] as String,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0xFF2D3748),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )),
+                  ],
+                  onChanged: (val) {
+                    if (val != 'divider') onChanged(val);
+                  },
                 ),
-                // centers
-                ...centers.map((c) => DropdownMenuItem<String?>(
-                  value: c['centerId'] as String,
-                  child: Row(children: [
-                    const Icon(Icons.location_on,
-                      color: Color(0xFF1D9E75), size: 16),
-                    const SizedBox(width: 10),
-                    Expanded(child: Text(
-                      c['centerName'] as String,
-                      overflow: TextOverflow.ellipsis,
-                    )),
-                  ]),
-                )),
-              ],
-              onChanged: (val) {
-                if (val != 'divider') onChanged(val);
-              },
+              ),
             ),
           ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }
